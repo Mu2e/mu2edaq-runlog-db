@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Runs — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  <h1 class="text-2xl font-bold text-slate-900">Runs</h1>
+
+  <!-- Query form -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-5">
+    <h2 class="text-base font-semibold text-slate-700 mb-4">Search by Time Period</h2>
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.start_time.id_for_label }}">
+          {{ form.start_time.label }}
+        </label>
+        {{ form.start_time }}
+        {% if form.start_time.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.start_time.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.end_time.id_for_label }}">
+          {{ form.end_time.label }}
+        </label>
+        {{ form.end_time }}
+        {% if form.end_time.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.end_time.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+      <button type="submit"
+              class="px-4 py-1.5 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+        Search
+      </button>
+    </form>
+    {% if form.non_field_errors %}
+    <p class="text-xs text-red-600 mt-2">{{ form.non_field_errors|join:", " }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Results -->
+  {% if runs is not None %}
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    {% if runs %}
+    <div class="px-5 py-3 border-b border-slate-100 text-sm text-slate-500">
+      {{ runs|length }} run{{ runs|length|pluralize }} found
+    </div>
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Run #</th>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Type</th>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Start (UTC)</th>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600 hidden md:table-cell">End (UTC)</th>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600 hidden lg:table-cell">Comment</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for run in runs %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium tabular-nums">
+            <a href="{% url 'runs:run_detail' run.run_number %}"
+               class="text-mu2e-primary hover:underline">{{ run.run_number }}</a>
+          </td>
+          <td class="px-4 py-3 text-slate-700">
+            {{ run.run_type_fk.name|default:run.run_type|default:"—" }}
+          </td>
+          <td class="px-4 py-3 text-slate-500 tabular-nums whitespace-nowrap">
+            {{ run.create_time|date:"Y-m-d H:i:s" }}
+          </td>
+          <td class="px-4 py-3 text-slate-500 tabular-nums whitespace-nowrap hidden md:table-cell">
+            {% if run.end_info %}{{ run.end_info.create_time|date:"Y-m-d H:i:s" }}{% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3 text-slate-500 hidden lg:table-cell">{{ run.comment|default:"" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="px-6 py-12 text-center text-slate-400 text-sm">
+      No runs found for the selected time period.
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Sign In — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="flex min-h-[60vh] items-center justify-center">
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm w-full max-w-md p-8">
+
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">Sign In</h1>
+    <p class="text-sm text-slate-500 mb-6">
+      Sign in with your institutional account to access the Mu2e DAQ run log.
+    </p>
+
+    {% if form.errors %}
+    <div class="mb-4 px-4 py-3 rounded-md text-sm bg-red-50 text-red-800 border border-red-200">
+      Authentication failed. Please try again.
+    </div>
+    {% endif %}
+
+    <div class="space-y-3">
+      <a href="{% provider_login_url 'openid_connect' process='login' server_id='fermilab' %}"
+         class="flex items-center justify-center w-full px-4 py-2.5 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white font-medium rounded-md transition-colors text-sm">
+        Sign in with Fermilab (CILogon)
+      </a>
+      <a href="{% provider_login_url 'google' %}"
+         class="flex items-center justify-center w-full px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-md transition-colors text-sm">
+        Sign in with Google
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

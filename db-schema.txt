@@ -1,0 +1,108 @@
+|table_name                   |column_name         |data_type                  |is_nullable|column_default                                                  |
+|-----------------------------|--------------------|---------------------------|-----------|----------------------------------------------------------------|
+|artdaq_components_notused    |run_number          |integer                    |NO         |                                                                |
+|artdaq_components_notused    |name                |character varying          |NO         |                                                                |
+|artdaq_components_notused    |rank                |integer                    |NO         |                                                                |
+|artdaq_components_notused    |host                |character varying          |NO         |                                                                |
+|artdaq_components_notused    |port                |character varying          |NO         |                                                                |
+|artdaq_components_notused    |label               |character varying          |NO         |                                                                |
+|artdaq_components_notused    |subsystem           |character varying          |YES        |                                                                |
+|artdaq_components_notused    |allowed_processors  |character varying          |YES        |                                                                |
+|artdaq_components_notused    |target              |character varying          |YES        |                                                                |
+|artdaq_fcl                   |run_number          |integer                    |NO         |                                                                |
+|artdaq_fcl                   |name                |character varying          |NO         |                                                                |
+|artdaq_fcl                   |label               |character varying          |NO         |                                                                |
+|artdaq_fcl                   |content             |text                       |NO         |                                                                |
+|config                       |run_number          |integer                    |NO         |                                                                |
+|config                       |subsystem           |text                       |NO         |                                                                |
+|config                       |config              |jsonb                      |NO         |                                                                |
+|config                       |create_time         |timestamp with time zone   |YES        |CURRENT_TIMESTAMP                                               |
+|config_old                   |id                  |bigint                     |NO         |nextval('test_sc.config_id_seq'::regclass)                      |
+|config_old                   |config_data         |jsonb                      |NO         |                                                                |
+|config_old                   |create_time         |timestamp with time zone   |NO         |                                                                |
+|config_old                   |type_id             |integer                    |NO         |0                                                               |
+|config_old                   |host_name           |character varying          |YES        |                                                                |
+|config_old                   |detector_setup_id   |integer                    |YES        |                                                                |
+|config_subsystem_data_notused|config_id           |bigint                     |NO         |                                                                |
+|config_subsystem_data_notused|subsystem           |character varying          |NO         |                                                                |
+|config_subsystem_data_notused|data                |jsonb                      |NO         |                                                                |
+|config_subsystem_data_notused|create_time         |timestamp with time zone   |NO         |                                                                |
+|config_subsystem_notused     |config_id           |bigint                     |NO         |                                                                |
+|config_subsystem_notused     |subsystem           |character varying          |NO         |                                                                |
+|config_subsystem_notused     |config_alias        |character varying          |NO         |                                                                |
+|config_subsystem_notused     |context_name        |character varying          |NO         |                                                                |
+|config_subsystem_notused     |context_key         |integer                    |NO         |                                                                |
+|config_subsystem_notused     |config_group_name   |character varying          |NO         |                                                                |
+|config_subsystem_notused     |config_group_key    |integer                    |NO         |                                                                |
+|config_subsystem_notused     |backbone_name       |character varying          |NO         |                                                                |
+|config_subsystem_notused     |backbone_key        |integer                    |NO         |                                                                |
+|config_subsystem_notused     |config_db_uri       |character varying          |NO         |                                                                |
+|config_subsystem_notused     |sw_version_id       |character varying          |NO         |                                                                |
+|config_subsystem_notused     |create_time         |timestamp with time zone   |NO         |                                                                |
+|detector_setup_notused       |id                  |integer                    |NO         |                                                                |
+|detector_setup_notused       |name                |character varying          |YES        |                                                                |
+|run                          |run_number          |bigint                     |NO         |nextval('production.run_configuration_run_number_seq'::regclass)|
+|run                          |comment             |character varying          |YES        |                                                                |
+|run                          |create_time         |timestamp with time zone   |NO         |                                                                |
+|run                          |run_type            |character varying          |YES        |                                                                |
+|run                          |run_type_id         |integer                    |YES        |                                                                |
+|run_end_info                 |run_number          |integer                    |NO         |                                                                |
+|run_end_info                 |comment             |text                       |YES        |                                                                |
+|run_end_info                 |create_time         |timestamp without time zone|YES        |CURRENT_TIMESTAMP                                               |
+|run_summary_notused          |run_number          |bigint                     |NO         |                                                                |
+|run_summary_notused          |comment             |character varying          |YES        |                                                                |
+|run_summary_notused          |data                |jsonb                      |YES        |                                                                |
+|run_summary_notused          |create_time         |timestamp with time zone   |NO         |CURRENT_TIMESTAMP                                               |
+|run_transition               |run_number          |bigint                     |NO         |                                                                |
+|run_transition               |type_id             |integer                    |NO         |                                                                |
+|run_transition               |cause_id            |integer                    |YES        |                                                                |
+|run_transition               |transition_time     |timestamp with time zone   |NO         |                                                                |
+|run_transition_cause         |id                  |integer                    |NO         |                                                                |
+|run_transition_cause         |name                |character varying          |NO         |                                                                |
+|run_transition_type          |id                  |integer                    |NO         |                                                                |
+|run_transition_type          |description         |character varying          |YES        |                                                                |
+|run_transition_type          |name                |character varying          |YES        |                                                                |
+|run_type                     |id                  |integer                    |NO         |                                                                |
+|run_type                     |description         |character varying          |NO         |                                                                |
+|run_type                     |name                |character varying          |YES        |                                                                |
+|subrun                       |run                 |integer                    |NO         |                                                                |
+|subrun                       |subrun              |integer                    |NO         |                                                                |
+|subrun                       |n_events            |bigint                     |YES        |                                                                |
+|subrun                       |n_on_spill          |bigint                     |YES        |                                                                |
+|subrun                       |n_off_spill         |bigint                     |YES        |                                                                |
+|subrun                       |min_ewt             |bigint                     |YES        |                                                                |
+|subrun                       |max_ewt             |bigint                     |YES        |                                                                |
+|subrun                       |start_time_unix     |integer                    |YES        |                                                                |
+|subrun                       |stop_time_unix      |integer                    |YES        |                                                                |
+|subrun                       |event_mode_counts   |jsonb                      |YES        |                                                                |
+|subrun                       |created_at          |timestamp with time zone   |YES        |now()                                                           |
+|subrun                       |n_null              |bigint                     |YES        |                                                                |
+|view_config_trigger          |run_number          |integer                    |YES        |                                                                |
+|view_config_trigger          |create_time         |timestamp with time zone   |YES        |                                                                |
+|view_config_trigger          |config              |jsonb                      |YES        |                                                                |
+|view_config_trigger          |name                |jsonb                      |YES        |                                                                |
+|view_config_trigger          |version             |jsonb                      |YES        |                                                                |
+|view_run_config              |run_number          |integer                    |YES        |                                                                |
+|view_run_config              |run_type            |character varying          |YES        |                                                                |
+|view_run_config              |subsystems          |ARRAY                      |YES        |                                                                |
+|view_run_config              |alias               |jsonb                      |YES        |                                                                |
+|view_run_config              |group_name          |jsonb                      |YES        |                                                                |
+|view_run_config              |group_key           |jsonb                      |YES        |                                                                |
+|view_run_db_services         |run_number          |integer                    |YES        |                                                                |
+|view_run_db_services         |trg_db_service_table|jsonb                      |YES        |                                                                |
+|view_run_db_services         |online_tables       |jsonb                      |YES        |                                                                |
+|view_run_subsystems          |run_number          |integer                    |YES        |                                                                |
+|view_run_subsystems          |run_type            |character varying          |YES        |                                                                |
+|view_run_subsystems          |subsystem           |text                       |YES        |                                                                |
+|view_run_subsystems          |configuration_alias |text                       |YES        |                                                                |
+|view_run_summary             |run_number          |bigint                     |YES        |                                                                |
+|view_run_summary             |comment             |character varying          |YES        |                                                                |
+|view_run_summary             |run_status          |text                       |YES        |                                                                |
+|view_run_summary             |run_type_name       |character varying          |YES        |                                                                |
+|view_run_summary             |start_time          |timestamp with time zone   |YES        |                                                                |
+|view_run_summary             |stop_time           |timestamp with time zone   |YES        |                                                                |
+|view_run_summary             |end_comment         |text                       |YES        |                                                                |
+|view_run_summary             |subsystems_list     |text                       |YES        |                                                                |
+|view_run_summary             |host_name           |text                       |YES        |                                                                |
+|view_run_summary             |artdaq_partition    |text                       |YES        |                                                                |
+|view_run_summary             |config_alias        |text                       |YES        |                                                                |

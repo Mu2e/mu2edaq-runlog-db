@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}New Subrun — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4 max-w-2xl">
+
+  <div class="flex items-center gap-3">
+    <a href="{% url 'runs:entry_index' %}" class="text-sm text-mu2e-primary hover:underline">&larr; Entry menu</a>
+    <span class="text-slate-300">|</span>
+    <h1 class="text-2xl font-bold text-slate-900">New Subrun</h1>
+  </div>
+
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+
+      <!-- Identity -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.run.id_for_label }}">{{ form.run.label }}</label>
+          {{ form.run }}
+          {% if form.run.errors %}<p class="text-xs text-red-600 mt-1">{{ form.run.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.subrun.id_for_label }}">{{ form.subrun.label }}</label>
+          {{ form.subrun }}
+          {% if form.subrun.errors %}<p class="text-xs text-red-600 mt-1">{{ form.subrun.errors|join:", " }}</p>{% endif %}
+        </div>
+      </div>
+
+      <!-- Event counts -->
+      <div>
+        <p class="text-xs font-semibold text-slate-600 mb-2">Event counts</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.n_events.id_for_label }}">{{ form.n_events.label }}</label>
+            {{ form.n_events }}
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.n_on_spill.id_for_label }}">{{ form.n_on_spill.label }}</label>
+            {{ form.n_on_spill }}
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.n_off_spill.id_for_label }}">{{ form.n_off_spill.label }}</label>
+            {{ form.n_off_spill }}
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.n_null.id_for_label }}">{{ form.n_null.label }}</label>
+            {{ form.n_null }}
+          </div>
+        </div>
+      </div>
+
+      <!-- EWT range -->
+      <div>
+        <p class="text-xs font-semibold text-slate-600 mb-2">Event Window Tag range</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.min_ewt.id_for_label }}">{{ form.min_ewt.label }}</label>
+            {{ form.min_ewt }}
+            {% if form.min_ewt.errors %}<p class="text-xs text-red-600 mt-1">{{ form.min_ewt.errors|join:", " }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.max_ewt.id_for_label }}">{{ form.max_ewt.label }}</label>
+            {{ form.max_ewt }}
+            {% if form.max_ewt.errors %}<p class="text-xs text-red-600 mt-1">{{ form.max_ewt.errors|join:", " }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Timing -->
+      <div>
+        <p class="text-xs font-semibold text-slate-600 mb-2">Timing (unix timestamps)</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.start_time_unix.id_for_label }}">{{ form.start_time_unix.label }}</label>
+            {{ form.start_time_unix }}
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1" for="{{ form.stop_time_unix.id_for_label }}">{{ form.stop_time_unix.label }}</label>
+            {{ form.stop_time_unix }}
+          </div>
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+      <p class="text-xs text-red-600">{{ form.non_field_errors|join:", " }}</p>
+      {% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+                class="px-4 py-2 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+          Save Subrun
+        </button>
+        <a href="{% url 'runs:entry_index' %}"
+           class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}New Run — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4 max-w-2xl">
+
+  <div class="flex items-center gap-3">
+    <a href="{% url 'runs:entry_index' %}" class="text-sm text-mu2e-primary hover:underline">&larr; Entry menu</a>
+    <span class="text-slate-300">|</span>
+    <h1 class="text-2xl font-bold text-slate-900">New Run</h1>
+  </div>
+
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.run_number.id_for_label }}">{{ form.run_number.label }}</label>
+          {{ form.run_number }}
+          {% if form.run_number.errors %}<p class="text-xs text-red-600 mt-1">{{ form.run_number.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.create_time.id_for_label }}">{{ form.create_time.label }}</label>
+          {{ form.create_time }}
+          {% if form.create_time.errors %}<p class="text-xs text-red-600 mt-1">{{ form.create_time.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.run_type.id_for_label }}">{{ form.run_type.label }}</label>
+          {{ form.run_type }}
+          {% if form.run_type.errors %}<p class="text-xs text-red-600 mt-1">{{ form.run_type.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.run_type_id.id_for_label }}">{{ form.run_type_id.label }}</label>
+          {{ form.run_type_id }}
+          {% if form.run_type_id.errors %}<p class="text-xs text-red-600 mt-1">{{ form.run_type_id.errors|join:", " }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+        {{ form.comment }}
+        {% if form.comment.errors %}<p class="text-xs text-red-600 mt-1">{{ form.comment.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+      <p class="text-xs text-red-600">{{ form.non_field_errors|join:", " }}</p>
+      {% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+                class="px-4 py-2 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+          Save Run
+        </button>
+        <a href="{% url 'runs:entry_index' %}"
+           class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

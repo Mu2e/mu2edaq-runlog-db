@@ -1,0 +1,24 @@
+# Virtual environment
+.venv/
+
+# Development database
+db.sqlite3
+*.sqlite3
+
+# Runtime files
+.runserver.pid
+.runserver.log
+
+# Python bytecode
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Secrets
+.env
+
+# Editor / OS
+.DS_Store
+*.swp
+*.swo

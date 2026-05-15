@@ -1,0 +1,28 @@
+database:
+  backend: sqlite
+  sqlite:
+    path: db.sqlite3
+  postgres:
+    host: localhost
+    port: 5432
+    name: runlogdb
+    user: runlog
+    password: ""
+
+auth:
+  enabled: true
+  providers:
+    fermilab_cilogon:
+      client_id: ""
+      client_secret: ""
+      oidc_endpoint: "https://cilogon.org"
+    google:
+      client_id: ""
+      client_secret: ""
+
+app:
+  debug: false
+  secret_key: "change-me-before-deploying"
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}EWT Lookup — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  <h1 class="text-2xl font-bold text-slate-900">Subrun Lookup by Event Window Tag</h1>
+
+  <!-- Query form -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-5">
+    <p class="text-sm text-slate-500 mb-4">
+      Enter a single EWT to find which subrun contains it, or enter a range to
+      find all subruns whose EWT ranges overlap.
+    </p>
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.ewt_min.id_for_label }}">
+          {{ form.ewt_min.label }}
+        </label>
+        {{ form.ewt_min }}
+        {% if form.ewt_min.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.ewt_min.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.ewt_max.id_for_label }}">
+          {{ form.ewt_max.label }}
+        </label>
+        {{ form.ewt_max }}
+        {% if form.ewt_max.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.ewt_max.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+      <button type="submit"
+              class="px-4 py-1.5 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+        Search
+      </button>
+    </form>
+    {% if form.non_field_errors %}
+    <p class="text-xs text-red-600 mt-2">{{ form.non_field_errors|join:", " }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Results -->
+  {% if subruns is not None %}
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    {% if subruns %}
+    <div class="px-5 py-3 border-b border-slate-100 text-sm text-slate-500">
+      {{ subruns|length }} subrun{{ subruns|length|pluralize }} found
+    </div>
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Run #</th>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Subrun</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600">Min EWT</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600">Max EWT</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden sm:table-cell">Events</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden md:table-cell">On-spill</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden md:table-cell">Off-spill</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for sr in subruns %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium tabular-nums">
+            <a href="{% url 'runs:run_detail' sr.run_fk_id %}"
+               class="text-mu2e-primary hover:underline">{{ sr.run_fk_id }}</a>
+          </td>
+          <td class="px-4 py-3 tabular-nums text-slate-700">{{ sr.subrun }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500">{{ sr.min_ewt|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500">{{ sr.max_ewt|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-700 hidden sm:table-cell">{{ sr.n_events|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden md:table-cell">{{ sr.n_on_spill|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden md:table-cell">{{ sr.n_off_spill|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="px-6 py-12 text-center text-slate-400 text-sm">
+      No subruns found for the given EWT value(s).
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

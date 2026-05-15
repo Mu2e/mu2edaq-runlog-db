@@ -1,0 +1,10 @@
+database:
+  backend: sqlite
+
+auth:
+  enabled: false
+
+app:
+  debug: true
+  allowed_hosts:
+    - "*"

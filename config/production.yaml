@@ -1,0 +1,8 @@
+database:
+  backend: postgres
+
+auth:
+  enabled: true
+
+app:
+  debug: false

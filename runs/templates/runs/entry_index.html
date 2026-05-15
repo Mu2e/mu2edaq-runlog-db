@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Data Entry — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  <h1 class="text-2xl font-bold text-slate-900">Manual Data Entry</h1>
+  <p class="text-sm text-slate-500">
+    Use these forms to manually add records to the run log database.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+    <a href="{% url 'runs:entry_run' %}"
+       class="bg-white rounded-lg border border-slate-200 shadow-sm p-6 hover:border-mu2e-primary hover:shadow-md transition-all group">
+      <h2 class="text-base font-semibold text-slate-800 group-hover:text-mu2e-primary mb-1">New Run</h2>
+      <p class="text-sm text-slate-500">Record the start of a new run.</p>
+    </a>
+
+    <a href="{% url 'runs:entry_run_end' %}"
+       class="bg-white rounded-lg border border-slate-200 shadow-sm p-6 hover:border-mu2e-primary hover:shadow-md transition-all group">
+      <h2 class="text-base font-semibold text-slate-800 group-hover:text-mu2e-primary mb-1">Run End Info</h2>
+      <p class="text-sm text-slate-500">Record end time and comment for an existing run.</p>
+    </a>
+
+    <a href="{% url 'runs:entry_subrun' %}"
+       class="bg-white rounded-lg border border-slate-200 shadow-sm p-6 hover:border-mu2e-primary hover:shadow-md transition-all group">
+      <h2 class="text-base font-semibold text-slate-800 group-hover:text-mu2e-primary mb-1">New Subrun</h2>
+      <p class="text-sm text-slate-500">Add subrun statistics (events, EWT range, timing).</p>
+    </a>
+
+  </div>
+
+</div>
+{% endblock %}

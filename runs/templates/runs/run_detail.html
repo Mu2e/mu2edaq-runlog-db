@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Run {{ run.run_number }} — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  <div class="flex items-center gap-3">
+    <a href="{% url 'runs:run_list' %}"
+       class="text-sm text-mu2e-primary hover:underline">&larr; Back to runs</a>
+    <span class="text-slate-300">|</span>
+    <h1 class="text-2xl font-bold text-slate-900">Run {{ run.run_number }}</h1>
+  </div>
+
+  <!-- Run metadata -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3 border-b border-slate-100 bg-slate-50">
+      <h2 class="text-base font-semibold text-slate-700">Run Details</h2>
+    </div>
+    <table class="text-sm divide-y divide-slate-100">
+      <tbody class="divide-y divide-slate-100">
+        <tr class="hover:bg-slate-50">
+          <th class="px-5 py-3 text-left font-medium text-slate-500 w-40">Run type</th>
+          <td class="px-5 py-3 text-slate-800">{{ run.run_type_fk.name|default:run.run_type|default:"—" }}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <th class="px-5 py-3 text-left font-medium text-slate-500">Start (UTC)</th>
+          <td class="px-5 py-3 text-slate-800 tabular-nums">{{ run.create_time|date:"Y-m-d H:i:s" }}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <th class="px-5 py-3 text-left font-medium text-slate-500">End (UTC)</th>
+          <td class="px-5 py-3 text-slate-800 tabular-nums">
+            {% if end_info %}{{ end_info.create_time|date:"Y-m-d H:i:s" }}{% else %}<span class="text-slate-400">—</span>{% endif %}
+          </td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <th class="px-5 py-3 text-left font-medium text-slate-500">Start comment</th>
+          <td class="px-5 py-3 text-slate-800">{{ run.comment|default:"—" }}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <th class="px-5 py-3 text-left font-medium text-slate-500">End comment</th>
+          <td class="px-5 py-3 text-slate-800">
+            {% if end_info %}{{ end_info.comment|default:"—" }}{% else %}<span class="text-slate-400">—</span>{% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Subruns -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+      <h2 class="text-base font-semibold text-slate-700">Subruns</h2>
+      <span class="text-sm text-slate-500">
+        Total events:
+        <strong class="text-slate-800 tabular-nums">
+          {% if total_events is not None %}{{ total_events }}{% else %}—{% endif %}
+        </strong>
+      </span>
+    </div>
+
+    {% if subruns %}
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold text-slate-600">Subrun</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600">Events</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden sm:table-cell">On-spill</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden sm:table-cell">Off-spill</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden md:table-cell">Null</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden lg:table-cell">Min EWT</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden lg:table-cell">Max EWT</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden xl:table-cell">Start (unix)</th>
+          <th class="px-4 py-3 text-right font-semibold text-slate-600 hidden xl:table-cell">Stop (unix)</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for sr in subruns %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium tabular-nums text-slate-800">{{ sr.subrun }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-700">{{ sr.n_events|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden sm:table-cell">{{ sr.n_on_spill|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden sm:table-cell">{{ sr.n_off_spill|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden md:table-cell">{{ sr.n_null|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden lg:table-cell">{{ sr.min_ewt|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden lg:table-cell">{{ sr.max_ewt|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden xl:table-cell">{{ sr.start_time_unix|default:"—" }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-500 hidden xl:table-cell">{{ sr.stop_time_unix|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="px-6 py-12 text-center text-slate-400 text-sm">
+      No subruns recorded for this run.
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
