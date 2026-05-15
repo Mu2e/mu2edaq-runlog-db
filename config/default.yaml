@@ -15,7 +15,7 @@ auth:
     fermilab_cilogon:
       client_id: ""
       client_secret: ""
-      oidc_endpoint: "https://cilogon.org"
+      oidc_endpoint: "https://kc.apps.okddev.fnal.gov/realms/myrealm"
     google:
       client_id: ""
       client_secret: ""

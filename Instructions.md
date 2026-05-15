@@ -112,8 +112,10 @@ RUNLOGDB_DB_PASSWORD=your-db-password
 
 ### 2 — Register SSO callback URIs
 
-**Fermilab CILogon** — register at [cilogon.org/oauth2/register](https://cilogon.org/oauth2/register)
+**Fermilab SSO (Keycloak)** — register a client in the `myrealm` realm at
+`https://kc.apps.okddev.fnal.gov`
 
+- OIDC discovery: `https://kc.apps.okddev.fnal.gov/realms/myrealm/.well-known/openid-configuration`
 - Callback URI: `https://<your-host>/accounts/oidc/fermilab/login/callback/`
 
 ```dotenv

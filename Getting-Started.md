@@ -145,10 +145,11 @@ views work without a login flow.
 
 ### Registering SSO applications
 
-#### Fermilab CILogon (OIDC)
+#### Fermilab SSO (Keycloak OIDC)
 
-1. Register at [cilogon.org/oauth2/register](https://cilogon.org/oauth2/register)
-2. Callback URIs to register:
+1. Register a client in the `myrealm` realm at `https://kc.apps.okddev.fnal.gov`
+2. OIDC discovery document: `https://kc.apps.okddev.fnal.gov/realms/myrealm/.well-known/openid-configuration`
+3. Callback URIs to register:
    - Dev: `http://localhost:8000/accounts/oidc/fermilab/login/callback/`
    - Prod: `https://<your-host>/accounts/oidc/fermilab/login/callback/`
 
