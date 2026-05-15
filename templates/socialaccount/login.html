@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Sign In — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="flex min-h-[60vh] items-center justify-center">
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm w-full max-w-md p-8">
+
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">Sign In Via {{ provider.name }}</h1>
+    <p class="text-sm text-slate-500 mb-6">
+      You are about to sign in using a third-party account from {{ provider.name }}.
+    </p>
+
+    <form method="post" action="{{ request.path }}?{{ request.GET.urlencode }}">
+      {% csrf_token %}
+      <button type="submit"
+              class="flex items-center justify-center w-full px-4 py-2.5 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white font-medium rounded-md transition-colors text-sm">
+        Continue
+      </button>
+    </form>
+
+    <div class="mt-4 text-center">
+      <a href="{% url 'account_login' %}" class="text-sm text-mu2e-accent hover:underline">Cancel</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
