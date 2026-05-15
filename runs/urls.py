@@ -14,4 +14,7 @@ urlpatterns = [
     path("entry/run/", views.entry_run, name="entry_run"),
     path("entry/run-end/", views.entry_run_end, name="entry_run_end"),
     path("entry/subrun/", views.entry_subrun, name="entry_subrun"),
+    # Misc
+    path("bug-report/", views.bug_report, name="bug_report"),
+    path("about/", views.about, name="about"),
 ]

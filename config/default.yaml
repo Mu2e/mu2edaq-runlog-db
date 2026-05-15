@@ -20,6 +20,10 @@ auth:
       client_id: ""
       client_secret: ""
 
+github:
+  token: ""
+  repo: "Mu2e/mu2edaq-runlog-db"
+
 app:
   debug: false
   secret_key: "change-me-before-deploying"

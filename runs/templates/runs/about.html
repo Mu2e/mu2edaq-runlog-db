@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}About — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4 max-w-3xl">
+
+  <h1 class="text-2xl font-bold text-slate-900">About</h1>
+
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm divide-y divide-slate-100">
+
+    <div class="px-6 py-5">
+      <h2 class="text-base font-semibold text-slate-800 mb-1">Mu2e DAQ Run Log Viewer</h2>
+      <p class="text-sm text-slate-600">
+        A web-based interface for querying and managing the Mu2e DAQ run-log database.
+        Supports searching runs by time period, inspecting subrun statistics, looking up
+        Event Window Tags, and manually entering run data.
+      </p>
+    </div>
+
+    <div class="px-6 py-5">
+      <h2 class="text-base font-semibold text-slate-800 mb-3">Details</h2>
+      <table class="text-sm w-full">
+        <tbody class="divide-y divide-slate-100">
+          <tr>
+            <th class="py-2 pr-6 text-left font-medium text-slate-500 w-40">Project</th>
+            <td class="py-2 text-slate-800">Mu2e Experiment — DAQ Group</td>
+          </tr>
+          <tr>
+            <th class="py-2 pr-6 text-left font-medium text-slate-500">Repository</th>
+            <td class="py-2">
+              <a href="https://github.com/{{ github_repo }}"
+                 class="text-mu2e-primary hover:underline" target="_blank" rel="noopener">
+                github.com/{{ github_repo }}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <th class="py-2 pr-6 text-left font-medium text-slate-500">Framework</th>
+            <td class="py-2 text-slate-800">Django 4.2 / Python 3.9+</td>
+          </tr>
+          <tr>
+            <th class="py-2 pr-6 text-left font-medium text-slate-500">Database</th>
+            <td class="py-2 text-slate-800">PostgreSQL (production) · SQLite (development)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="px-6 py-5">
+      <h2 class="text-base font-semibold text-slate-800 mb-3">Available queries</h2>
+      <ul class="text-sm text-slate-600 space-y-2">
+        <li>
+          <a href="{% url 'runs:run_list' %}" class="text-mu2e-primary hover:underline font-medium">Runs by time period</a>
+          — search for runs within a UTC date/time range
+        </li>
+        <li>
+          <span class="font-medium text-slate-700">Run detail</span>
+          — view subruns, event counts, and timing for a specific run
+        </li>
+        <li>
+          <a href="{% url 'runs:subrun_ewt' %}" class="text-mu2e-primary hover:underline font-medium">EWT lookup</a>
+          — find the subrun(s) containing a given Event Window Tag or range
+        </li>
+      </ul>
+    </div>
+
+    <div class="px-6 py-5">
+      <h2 class="text-base font-semibold text-slate-800 mb-3">Documentation</h2>
+      <ul class="text-sm space-y-1">
+        <li>
+          <a href="https://github.com/{{ github_repo }}/blob/main/Instructions.md"
+             class="text-mu2e-primary hover:underline" target="_blank" rel="noopener">
+            Instructions.md
+          </a>
+          — quick-start guide and configuration reference
+        </li>
+        <li>
+          <a href="https://github.com/{{ github_repo }}/blob/main/Getting-Started.md"
+             class="text-mu2e-primary hover:underline" target="_blank" rel="noopener">
+            Getting-Started.md
+          </a>
+          — full technical documentation
+        </li>
+        <li>
+          <a href="https://github.com/{{ github_repo }}/blob/main/db-schema.md"
+             class="text-mu2e-primary hover:underline" target="_blank" rel="noopener">
+            db-schema.md
+          </a>
+          — database schema diagram and table descriptions
+        </li>
+      </ul>
+    </div>
+
+    <div class="px-6 py-5 flex gap-4">
+      <a href="{% url 'runs:bug_report' %}"
+         class="inline-flex items-center px-4 py-2 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+        Report a bug
+      </a>
+      <a href="https://github.com/{{ github_repo }}/issues"
+         class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md transition-colors"
+         target="_blank" rel="noopener">
+        View all issues on GitHub
+      </a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

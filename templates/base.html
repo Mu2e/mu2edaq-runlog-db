@@ -32,6 +32,7 @@
             <a href="{% url 'runs:run_list' %}" class="opacity-90 hover:opacity-100 hover:underline">Runs</a>
             <a href="{% url 'runs:subrun_ewt' %}" class="opacity-90 hover:opacity-100 hover:underline">EWT Lookup</a>
             <a href="{% url 'runs:entry_index' %}" class="opacity-90 hover:opacity-100 hover:underline">Data Entry</a>
+            <a href="{% url 'runs:about' %}" class="opacity-90 hover:opacity-100 hover:underline">About</a>
           </div>
           {% endif %}
         </div>
@@ -39,6 +40,10 @@
         {% if user.is_authenticated %}
         <div class="flex items-center gap-3 text-sm">
           <span class="opacity-80 truncate max-w-[160px]">{{ user.username }}</span>
+          <a href="{% url 'runs:bug_report' %}"
+             class="bg-white/10 hover:bg-white/25 px-3 py-1 rounded text-sm transition-colors">
+            Report a bug
+          </a>
           <form method="post" action="{% url 'account_logout' %}">
             {% csrf_token %}
             <button type="submit"

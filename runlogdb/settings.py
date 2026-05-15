@@ -112,6 +112,11 @@ else:
 
 DATABASE_ROUTERS = ["runlogdb.db_router.ProductionRouter"]
 
+# ── GitHub integration ────────────────────────────────────────────────────────
+_gh = _cfg.get("github", {})
+GITHUB_TOKEN = os.environ.get("RUNLOGDB_GITHUB_TOKEN", _gh.get("token", ""))
+GITHUB_REPO = os.environ.get("RUNLOGDB_GITHUB_REPO", _gh.get("repo", "Mu2e/mu2edaq-runlog-db"))
+
 # ── Auth settings exposed to other modules ───────────────────────────────────
 AUTH_ENABLED = _auth["enabled"]
 

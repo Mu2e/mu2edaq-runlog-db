@@ -18,6 +18,9 @@ __pycache__/
 # Secrets
 .env
 
+# Screenshots
+screenshots/
+
 # Editor / OS
 .DS_Store
 *.swp

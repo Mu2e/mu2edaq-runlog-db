@@ -1,10 +1,15 @@
+import urllib.request
+import urllib.error
+import json
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import RunEndInfoForm, RunForm, RunsByTimeForm, SubrunByEwtForm, SubrunForm
+from .forms import BugReportForm, RunEndInfoForm, RunForm, RunsByTimeForm, SubrunByEwtForm, SubrunForm
 from .models import Run, RunEndInfo, RunType, Subrun
 
 
@@ -121,6 +126,94 @@ def entry_run_end(request):
         except IntegrityError:
             form.add_error("run_number", "End info for this run already exists.")
     return render(request, "runs/entry_run_end.html", {"form": form})
+
+
+@login_required
+def bug_report(request):
+    form = BugReportForm(request.POST or None)
+    issue_url = None
+    api_error = None
+    token_missing = not bool(settings.GITHUB_TOKEN)
+
+    if request.method == "POST" and form.is_valid():
+        if token_missing:
+            api_error = "GitHub token is not configured. Set RUNLOGDB_GITHUB_TOKEN in your .env file."
+        else:
+            d = form.cleaned_data
+            body = _build_issue_body(d, request.user)
+            issue_url, api_error = _create_github_issue(
+                title=f"[{d['severity'].upper()}] {d['title']}",
+                body=body,
+                labels=["bug", d["severity"]],
+            )
+            if issue_url:
+                messages.success(request, f"Issue created: {issue_url}")
+                return redirect(issue_url)
+
+    return render(request, "runs/bug_report.html", {
+        "form": form,
+        "issue_url": issue_url,
+        "api_error": api_error,
+        "token_missing": token_missing,
+        "github_repo": settings.GITHUB_REPO,
+    })
+
+
+def _build_issue_body(d: dict, user) -> str:
+    lines = []
+    lines.append(f"**Reported by:** {user.username}")
+    lines.append(f"**Severity:** {d['severity']}")
+    lines.append("")
+    lines.append("## Description")
+    lines.append(d["description"])
+    if d.get("steps"):
+        lines.append("")
+        lines.append("## Steps to reproduce")
+        lines.append(d["steps"])
+    if d.get("expected"):
+        lines.append("")
+        lines.append("## Expected behaviour")
+        lines.append(d["expected"])
+    if d.get("actual"):
+        lines.append("")
+        lines.append("## Actual behaviour")
+        lines.append(d["actual"])
+    lines.append("")
+    lines.append("---")
+    lines.append("*Submitted via Mu2e DAQ Run Log Viewer bug report page.*")
+    return "\n".join(lines)
+
+
+def _create_github_issue(title: str, body: str, labels: list):
+    """POST to the GitHub Issues API. Returns (issue_url, error_message)."""
+    repo = settings.GITHUB_REPO
+    token = settings.GITHUB_TOKEN
+    url = f"https://api.github.com/repos/{repo}/issues"
+    payload = json.dumps({"title": title, "body": body, "labels": labels}).encode()
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "User-Agent": "mu2edaq-runlog-viewer",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+            return data["html_url"], None
+    except urllib.error.HTTPError as e:
+        detail = json.loads(e.read()).get("message", str(e))
+        return None, f"GitHub API error {e.code}: {detail}"
+    except Exception as e:
+        return None, str(e)
+
+
+def about(request):
+    return render(request, "runs/about.html", {"github_repo": settings.GITHUB_REPO})
 
 
 @login_required

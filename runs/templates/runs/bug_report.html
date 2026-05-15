@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Bug Report — Mu2e DAQ Run Log{% endblock %}
+
+{% block content %}
+<div class="space-y-4 max-w-2xl">
+
+  <h1 class="text-2xl font-bold text-slate-900">Report a Bug</h1>
+  <p class="text-sm text-slate-500">
+    Submitting this form creates a GitHub issue in
+    <a href="https://github.com/{{ github_repo }}/issues"
+       class="text-mu2e-primary hover:underline" target="_blank" rel="noopener">
+      {{ github_repo }}
+    </a>.
+  </p>
+
+  {% if token_missing %}
+  <div class="px-4 py-3 rounded-md text-sm bg-yellow-50 text-yellow-800 border border-yellow-200">
+    <strong>GitHub token not configured.</strong>
+    Set <code class="font-mono bg-yellow-100 px-1 rounded">RUNLOGDB_GITHUB_TOKEN</code>
+    in your <code class="font-mono bg-yellow-100 px-1 rounded">.env</code> file to enable
+    automatic issue creation. You can still
+    <a href="https://github.com/{{ github_repo }}/issues/new"
+       class="underline" target="_blank" rel="noopener">file an issue manually on GitHub</a>.
+  </div>
+  {% endif %}
+
+  {% if api_error %}
+  <div class="px-4 py-3 rounded-md text-sm bg-red-50 text-red-800 border border-red-200">
+    <strong>Failed to create issue:</strong> {{ api_error }}
+  </div>
+  {% endif %}
+
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        {{ form.title }}
+        {% if form.title.errors %}<p class="text-xs text-red-600 mt-1">{{ form.title.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.severity.id_for_label }}">{{ form.severity.label }}</label>
+        {{ form.severity }}
+        {% if form.severity.errors %}<p class="text-xs text-red-600 mt-1">{{ form.severity.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+        {{ form.description }}
+        {% if form.description.errors %}<p class="text-xs text-red-600 mt-1">{{ form.description.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1"
+               for="{{ form.steps.id_for_label }}">{{ form.steps.label }} <span class="font-normal">(optional)</span></label>
+        {{ form.steps }}
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.expected.id_for_label }}">{{ form.expected.label }} <span class="font-normal">(optional)</span></label>
+          {{ form.expected }}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1"
+                 for="{{ form.actual.id_for_label }}">{{ form.actual.label }} <span class="font-normal">(optional)</span></label>
+          {{ form.actual }}
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+      <p class="text-xs text-red-600">{{ form.non_field_errors|join:", " }}</p>
+      {% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+                class="px-4 py-2 bg-mu2e-primary hover:bg-mu2e-primary-hover text-white text-sm font-medium rounded-md transition-colors">
+          Submit Issue
+        </button>
+        <a href="{% url 'runs:run_list' %}"
+           class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

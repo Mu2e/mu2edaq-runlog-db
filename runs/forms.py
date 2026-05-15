@@ -65,6 +65,55 @@ class SubrunByEwtForm(forms.Form):
         return cleaned
 
 
+# ── Bug report form ───────────────────────────────────────────────────────────
+
+class BugReportForm(forms.Form):
+    SEVERITY_CHOICES = [
+        ("low", "Low — minor annoyance"),
+        ("medium", "Medium — functionality impaired"),
+        ("high", "High — major feature broken"),
+        ("critical", "Critical — data loss or security issue"),
+    ]
+
+    title = forms.CharField(
+        label="Title",
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": _INPUT_CLASS, "placeholder": "Short description of the issue"}),
+    )
+    severity = forms.ChoiceField(
+        label="Severity",
+        choices=SEVERITY_CHOICES,
+        widget=forms.Select(attrs={"class": _SELECT_CLASS}),
+    )
+    description = forms.CharField(
+        label="Description",
+        widget=forms.Textarea(attrs={
+            "class": _TEXTAREA_CLASS,
+            "rows": 4,
+            "placeholder": "What went wrong?",
+        }),
+    )
+    steps = forms.CharField(
+        label="Steps to reproduce",
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": _TEXTAREA_CLASS,
+            "rows": 3,
+            "placeholder": "1. Go to ...\n2. Click ...\n3. See error",
+        }),
+    )
+    expected = forms.CharField(
+        label="Expected behaviour",
+        required=False,
+        widget=forms.TextInput(attrs={"class": _INPUT_CLASS}),
+    )
+    actual = forms.CharField(
+        label="Actual behaviour",
+        required=False,
+        widget=forms.TextInput(attrs={"class": _INPUT_CLASS}),
+    )
+
+
 # ── Data entry forms ──────────────────────────────────────────────────────────
 
 class RunForm(forms.Form):
