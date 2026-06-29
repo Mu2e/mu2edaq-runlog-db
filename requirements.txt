@@ -4,3 +4,5 @@ PyYAML>=6.0
 python-dotenv>=1.0
 psycopg2-binary>=2.9
 gunicorn>=21.2
+# Mu2e DAQ service discovery (stdlib-only; from the sibling submodule).
+mu2edaq-discovery
