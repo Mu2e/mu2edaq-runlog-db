@@ -1,0 +1,136 @@
+.TH MANAGE.PY 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+manage.py \- Django management entry point of mu2edaq-runlog-db
+.SH SYNOPSIS
+.B .venv/bin/python manage.py
+.I subcommand
+.RI [ options ]
+.br
+.B .venv/bin/python manage.py seed_db
+.RB [ \-\-runs
+.IR N ]
+.RB [ \-\-subruns\-per\-run
+.IR M ]
+.RB [ \-\-start\-run
+.IR R ]
+.br
+.B .venv/bin/python manage.py purge_db
+.RB [ \-\-confirm ]
+.SH DESCRIPTION
+Standard Django
+.B manage.py
+with
+.B DJANGO_SETTINGS_MODULE=runlogdb.settings
+as the default.
+Settings are resolved as described in
+.BR mu2edaq\-runlog\-db.yaml (5);
+in particular
+.B DJANGO_ENV
+(default
+.BR development )
+selects SQLite or PostgreSQL.
+.B Every subcommand acts on whatever database that resolves to, including
+.B the production run log.
+.PP
+The package adds two subcommands.
+.TP
+.B seed_db
+Creates lookup rows
+.RB ( run_type
+ids 1\(en5,
+.B run_transition_type
+ids 1\(en4,
+.B run_transition_cause
+ids 1\(en4, by
+.BR get_or_create )
+and then, for each of
+.I N
+runs starting at
+.IR R ,
+a
+.B run
+row with an explicit run number, a
+.B run_end_info
+row, two
+.B run_transition
+rows, 2\(en5
+.B config
+rows and
+.I M
+.B subrun
+rows with random event counts and EWT ranges.
+Existing run numbers are skipped.
+All inside one transaction.
+.TP
+.B purge_db
+Deletes every row from
+.BR artdaq_fcl ,
+.BR config ,
+.BR run_transition ,
+.BR subrun ,
+.BR run_end_info ,
+.BR run ,
+.BR run_type ,
+.B run_transition_type
+and
+.BR run_transition_cause ,
+in that order, in one transaction.
+It first prints the row count and asks for
+.BR yes .
+.SH OPTIONS
+.TP
+.BI \-\-runs " N"
+seed_db: number of runs (default 10).
+.TP
+.BI \-\-subruns\-per\-run " M"
+seed_db: subruns per run (default 5).
+.TP
+.BI \-\-start\-run " R"
+seed_db: first run number (default 1001).
+.TP
+.B \-\-confirm
+purge_db: skip the
+.B yes
+prompt.
+.SH ENVIRONMENT
+.BR DJANGO_ENV ,
+.BR DJANGO_SETTINGS_MODULE ,
+and the
+.B RUNLOGDB_*
+variables of
+.BR mu2edaq\-runlog\-db.yaml (5).
+.SH EXIT STATUS
+0 on success, including when
+.B purge_db
+is aborted at the prompt or finds nothing to delete.
+Non-zero on a Django
+.B CommandError
+or an uncaught exception.
+.SH EXAMPLES
+.RS
+.nf
+DJANGO_ENV=development .venv/bin/python manage.py seed_db \-\-runs 5
+DJANGO_ENV=development .venv/bin/python manage.py purge_db
+DJANGO_ENV=development .venv/bin/python manage.py shell
+.fi
+.RE
+.SH CAVEATS
+Neither command checks the backend.
+With
+.B DJANGO_ENV=production
+.B purge_db
+deletes the production run log, including the rows written by the DAQ's
+.B DBRunInfo
+plugin, and
+.B seed_db
+inserts fake runs with explicit run numbers that the database sequence does
+not know about, so a later DAQ run start can fail with a duplicate key.
+Check
+.B DJANGO_ENV
+before running either.
+.SH SEE ALSO
+.BR start\-mu2e\-rundb\-viewer (1),
+.BR mu2edaq\-runlog\-db.yaml (5),
+.BR mu2edaq\-runlog\-db (7)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

@@ -1,0 +1,149 @@
+.TH START-MU2E-RUNDB-VIEWER 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+start-mu2e-rundb-viewer \- bootstrap, migrate and start the run-log viewer
+.SH SYNOPSIS
+.B start\-mu2e\-rundb\-viewer
+.SH DESCRIPTION
+Starts the Django run-log viewer from the checkout that contains the script.
+It performs, in order:
+.IP 1. 4
+Runs
+.BR bootstrap\-mu2e\-rundb\-viewer (1),
+which creates
+.I .venv/
+if needed and runs
+.B pip install \-\-upgrade
+against PyPI.
+The script runs under
+.BR "set \-euo pipefail" ,
+so a host without PyPI access cannot start the viewer.
+.IP 2. 4
+If
+.I .runserver.pid
+names a live process, prints a message and exits 0; a stale PID file is
+removed.
+.IP 3. 4
+Exports
+.B DJANGO_ENV
+(default
+.BR development )
+and
+.BR DJANGO_SETTINGS_MODULE=runlogdb.settings .
+.IP 4. 4
+Runs
+.B manage.py migrate
+on every start.
+On PostgreSQL the
+.B runs
+app is skipped by
+.IR runlogdb/db_router.py ,
+but Django's own tables (auth, sessions, sites, allauth) are created in the
+same database.
+.IP 5. 4
+Starts the server.
+With
+.B DJANGO_ENV=production
+it runs gunicorn with 4 workers,
+.B \-\-daemon
+and
+.BR "\-\-pid .runserver.pid" ;
+otherwise Django's
+.B runserver \-\-noreload
+in the background with output to
+.IR .runserver.log .
+If
+.I /.dockerenv
+exists the server is
+.BR exec ed
+in the foreground instead.
+.PP
+.B DJANGO_ENV is decided here, not in .env.
+The script exports
+.B DJANGO_ENV=development
+when the variable is not already in its environment.
+.I runlogdb/settings.py
+loads
+.I .env
+with python-dotenv, which does not override variables that are already set,
+so a
+.B DJANGO_ENV=production
+line in
+.I .env
+is ignored.
+The result is development mode: authentication disabled, every request
+logged in as the superuser
+.BR dev ,
+.BR DEBUG ,
+.B ALLOWED_HOSTS
+.BR * ,
+and a local SQLite database.
+Export
+.B DJANGO_ENV=production
+in the calling environment to get production mode.
+.SH OPTIONS
+None.
+Arguments are accepted and ignored.
+.SH ENVIRONMENT
+.TP
+.B DJANGO_ENV
+.B development
+(default) or
+.BR production .
+Selects the server and the
+.IR config/ "<DJANGO_ENV>" .yaml
+overlay.
+.TP
+.B RUNLOGDB_HOST
+Bind address, default
+.BR 127.0.0.1 .
+Read by the shell only; a value in
+.I .env
+has no effect.
+.TP
+.B RUNLOGDB_PORT
+Bind port, default
+.BR 8000 .
+Also read by the discovery responder in
+.IR runs/apps.py .
+Read by the shell; a value in
+.I .env
+is seen by the responder but not by the server.
+.PP
+All
+.B RUNLOGDB_*
+settings variables are described in
+.BR mu2edaq\-runlog\-db.yaml (5).
+.SH FILES
+.TP
+.I .venv/
+Virtual environment created by the bootstrap script.
+.TP
+.I .runserver.pid
+PID of the gunicorn master or the runserver process.
+.TP
+.I .runserver.log
+runserver output (development mode, outside Docker).
+gunicorn in daemon mode has no log file configured.
+.TP
+.I db.sqlite3
+SQLite database (development backend).
+.SH EXIT STATUS
+0 when the server was started or was already running.
+Non-zero when bootstrap,
+.B migrate
+or the server launch fails.
+.SH EXAMPLES
+.RS
+.nf
+DJANGO_ENV=production RUNLOGDB_HOST=0.0.0.0 ./start\-mu2e\-rundb\-viewer
+\&./start\-mu2e\-rundb\-viewer          # development mode on 127.0.0.1:8000
+.fi
+.RE
+.SH SEE ALSO
+.BR stop\-mu2e\-rundb\-viewer (1),
+.BR bootstrap\-mu2e\-rundb\-viewer (1),
+.BR start\-mu2edaq\-runlog\-db.sh (1),
+.BR mu2edaq\-runlog\-db.yaml (5),
+.BR mu2edaq\-runlog\-db (7)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

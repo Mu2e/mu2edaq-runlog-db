@@ -1,0 +1,29 @@
+.TH STOP-MU2EDAQ-RUNLOG-DB.SH 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+stop-mu2edaq-runlog-db.sh \- control-room stop wrapper for the run-log viewer
+.SH SYNOPSIS
+.B stop\-mu2edaq\-runlog\-db.sh
+.SH DESCRIPTION
+Standardised Mu2e control-room stop script, run by
+.BR "crs-app stop runlog-db" .
+It
+.BR exec s
+.BR stop\-mu2e\-rundb\-viewer (1)
+with any arguments.
+A regular file, not a symbolic link.
+.SH OPTIONS
+None.
+.SH EXIT STATUS
+That of
+.BR stop\-mu2e\-rundb\-viewer (1).
+.SH EXAMPLES
+.RS
+.nf
+\&./stop\-mu2edaq\-runlog\-db.sh
+.fi
+.RE
+.SH SEE ALSO
+.BR start\-mu2edaq\-runlog\-db.sh (1),
+.BR stop\-mu2e\-rundb\-viewer (1)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

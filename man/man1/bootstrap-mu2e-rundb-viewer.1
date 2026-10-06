@@ -1,0 +1,56 @@
+.TH BOOTSTRAP-MU2E-RUNDB-VIEWER 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+bootstrap-mu2e-rundb-viewer \- create or update the viewer virtualenv
+.SH SYNOPSIS
+.B bootstrap\-mu2e\-rundb\-viewer
+.SH DESCRIPTION
+Creates
+.I .venv/
+next to the script with
+.B python3 \-m venv
+if
+.I .venv/bin/python
+is not executable, then runs
+.B pip install \-\-upgrade pip
+and
+.BR "pip install \-r requirements.txt \-\-upgrade" .
+Every run contacts PyPI and may move installed packages to newer versions
+within the ranges in
+.IR requirements.txt .
+It is called on every start by
+.BR start\-mu2e\-rundb\-viewer (1).
+.PP
+.I requirements.txt
+pins Django 4.2.x, django-allauth 0.61.x, PyYAML, python-dotenv,
+psycopg2-binary and gunicorn.
+The optional
+.B mu2edaq\-discovery
+package is deliberately not listed (it is not on PyPI); install it from the
+sibling checkout with
+.B pip install ../mu2edaq\-discovery
+to enable service announcement.
+.SH OPTIONS
+None.
+.SH FILES
+.TP
+.I .venv/
+.TP
+.I requirements.txt
+.SH EXIT STATUS
+0 on success; the exit status of the failing
+.B python3
+or
+.B pip
+command otherwise (the script runs under
+.BR "set \-euo pipefail" ).
+.SH EXAMPLES
+.RS
+.nf
+\&./bootstrap\-mu2e\-rundb\-viewer
+\&.venv/bin/pip install ../mu2edaq\-discovery
+.fi
+.RE
+.SH SEE ALSO
+.BR start\-mu2e\-rundb\-viewer (1)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

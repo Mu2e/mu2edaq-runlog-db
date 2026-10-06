@@ -1,0 +1,193 @@
+.TH MU2EDAQ-RUNLOG-DB.YAML 5 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+mu2edaq-runlog-db.yaml \- run-log viewer configuration files and variables
+.SH SYNOPSIS
+.I config/default.yaml
+.br
+.I config/development.yaml
+.br
+.I config/production.yaml
+.br
+.I .env
+.SH DESCRIPTION
+.I runlogdb/settings.py
+builds the Django settings in this order, later sources winning:
+.IP 1. 4
+.I .env
+in the checkout, loaded with python-dotenv
+.BR "override=False" :
+a variable already present in the process environment is
+.B not
+replaced.
+.IP 2. 4
+.IR config/default.yaml .
+.IP 3. 4
+.IR config/ "<DJANGO_ENV>" .yaml ,
+deep-merged over the default.
+.B DJANGO_ENV
+defaults to
+.BR development .
+.IP 4. 4
+.B RUNLOGDB_*
+environment variables for the keys listed below.
+.PP
+.BR start\-mu2e\-rundb\-viewer (1)
+exports
+.B DJANGO_ENV=development
+before Django starts when the variable is unset, so a
+.B DJANGO_ENV
+line in
+.I .env
+never takes effect through the start scripts.
+.SH KEYS
+.TP
+.B database.backend
+.B sqlite
+or
+.BR postgres .
+Default
+.BR sqlite ;
+.B postgres
+in
+.IR production.yaml .
+Env
+.BR RUNLOGDB_DB_BACKEND .
+.TP
+.B database.sqlite.path
+Relative to the checkout.
+Default
+.IR db.sqlite3 .
+No env override.
+.TP
+.BR database.postgres.host ", " .port ", " .name ", " .user ", " .password
+Defaults
+.BR localhost ,
+.BR 5432 ,
+.BR runlogdb ,
+.BR runlog ,
+empty.
+Env
+.BR RUNLOGDB_DB_HOST ,
+.BR RUNLOGDB_DB_PORT ,
+.BR RUNLOGDB_DB_NAME ,
+.BR RUNLOGDB_DB_USER ,
+.BR RUNLOGDB_DB_PASSWORD .
+No schema or
+.B search_path
+setting exists; table names are unqualified.
+.TP
+.B auth.enabled
+Default
+.BR true ;
+.B false
+in
+.IR development.yaml .
+Env
+.BR RUNLOGDB_AUTH_ENABLED .
+When false,
+.I runlogdb/middleware.py
+logs every request in as a superuser named
+.BR dev .
+When true, django-allauth is active and its local
+.I /accounts/signup/
+endpoint is open to anyone (see
+.BR mu2edaq\-runlog\-db (7)).
+.TP
+.BR auth.providers.fermilab_cilogon. { client_id , client_secret , oidc_endpoint }
+OIDC provider labelled "Fermilab CILogon".
+.B oidc_endpoint
+defaults to
+.BR https://kc.apps.okddev.fnal.gov/realms/myrealm ,
+a development Keycloak realm.
+Env
+.BR RUNLOGDB_FERMILAB_CLIENT_ID ,
+.BR RUNLOGDB_FERMILAB_CLIENT_SECRET ;
+no env override for the endpoint.
+.TP
+.BR auth.providers.google. { client_id , client_secret }
+Env
+.BR RUNLOGDB_GOOGLE_CLIENT_ID ,
+.BR RUNLOGDB_GOOGLE_CLIENT_SECRET .
+Any Google account is accepted.
+.TP
+.B github.token
+Personal access token used by the bug-report page to create issues.
+Env
+.BR RUNLOGDB_GITHUB_TOKEN .
+.TP
+.B github.repo
+Default
+.BR Mu2e/mu2edaq\-runlog\-db .
+Env
+.BR RUNLOGDB_GITHUB_REPO .
+.TP
+.B app.debug
+Default
+.BR false ;
+.B true
+in
+.IR development.yaml .
+Env
+.BR RUNLOGDB_DEBUG ;
+any value other than
+.BR 0 ,
+.BR false ,
+.B no
+or
+.B off
+is true.
+.TP
+.B app.secret_key
+Default
+.BR change\-me\-before\-deploying ,
+also used in production unless
+.B RUNLOGDB_SECRET_KEY
+is set.
+Nothing checks that it was changed.
+.TP
+.B app.allowed_hosts
+Default
+.BR "[localhost, 127.0.0.1]" ,
+inherited by production;
+.B ["*"]
+in
+.IR development.yaml .
+No env override.
+.SH ENVIRONMENT
+Besides the
+.B RUNLOGDB_*
+variables above:
+.TP
+.B DJANGO_ENV
+Overlay name.
+.TP
+.BR RUNLOGDB_HOST ", " RUNLOGDB_PORT
+Bind address and port, read by the start script, not by
+.IR settings.py .
+.B RUNLOGDB_PORT
+is also the port announced by the discovery responder.
+.SH FILES
+.TP
+.I .env.example
+Template for
+.IR .env ;
+.I .env
+is git-ignored.
+.SH EXAMPLES
+A production environment, exported before starting:
+.PP
+.RS
+.nf
+export DJANGO_ENV=production
+export RUNLOGDB_SECRET_KEY="$(python3 \-c 'import secrets; print(secrets.token_urlsafe(50))')"
+export RUNLOGDB_DB_HOST=db.example RUNLOGDB_DB_NAME=runlogdb
+export RUNLOGDB_DB_USER=runlog RUNLOGDB_DB_PASSWORD=...
+\&./start\-mu2e\-rundb\-viewer
+.fi
+.RE
+.SH SEE ALSO
+.BR start\-mu2e\-rundb\-viewer (1),
+.BR manage.py (1),
+.BR mu2edaq\-runlog\-db (7)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

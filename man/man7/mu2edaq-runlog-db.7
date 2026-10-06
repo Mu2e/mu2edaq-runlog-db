@@ -1,0 +1,164 @@
+.TH MU2EDAQ-RUNLOG-DB 7 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+mu2edaq-runlog-db \- web viewer and entry tool for the Mu2e DAQ run log
+.SH SYNOPSIS
+.B http://<host>:8000/runs/
+.SH DESCRIPTION
+A Django 4.2 application (project
+.BR runlogdb ,
+app
+.BR runs )
+served by gunicorn (production) or
+.B manage.py runserver
+(development) on TCP port 8000.
+It queries the run-log tables
+.BR run ,
+.BR subrun ,
+.BR run_end_info ,
+.BR run_type
+and their lookups, and offers forms that insert rows into
+.BR run ,
+.B run_end_info
+and
+.BR subrun .
+.PP
+In production the tables live in PostgreSQL and are written by the otsdaq
+run-info plugin
+.B DBRunInfo
+(otsdaq-mu2e,
+.IR RunInfoPlugins/DBRunInfo_runInfo.cc ),
+which inserts into
+.BR run ,
+.BR run_transition ,
+.B run_end_info
+and
+.B config
+under the schema named by
+.BR OTSDAQ_RUNINFO_DATABASE_SCHEMA .
+The
+.B run
+row's number comes from the database sequence
+.RB ( "RETURNING run_number" ).
+.B DBRunInfo
+does not write
+.BR subrun .
+.SH HTTP ROUTES
+.TP
+.B GET /
+Redirect to
+.IR /runs/ .
+.TP
+.B GET /runs/?start_time=&end_time=
+Runs whose
+.B create_time
+falls in the UTC range.
+.TP
+.B GET /runs/<N>/subruns/
+Subruns of run
+.I N
+with total events and end info.
+.TP
+.B GET /runs/subruns/ewt/?ewt_min=&ewt_max=
+Subruns whose
+.RB [ min_ewt ,
+.BR max_ewt ]
+contains or overlaps the given Event Window Tag range.
+.TP
+.B GET /runs/entry/
+Index of the entry forms.
+.TP
+.B GET|POST /runs/entry/run/
+Insert a
+.B run
+row with an operator-supplied run number.
+.TP
+.B GET|POST /runs/entry/run\-end/
+Insert a
+.B run_end_info
+row.
+.TP
+.B GET|POST /runs/entry/subrun/
+Insert a
+.B subrun
+row.
+.TP
+.B GET|POST /runs/bug\-report/
+Create a GitHub issue in
+.B github.repo
+with the server's token.
+.TP
+.B GET /runs/about/
+About page; the only
+.I /runs/
+route without
+.BR @login_required .
+.TP
+.B /accounts/...
+django-allauth: login, logout, signup, social login callbacks.
+.TP
+.B /admin/
+Django admin; the run-log models are not registered, only Django's and allauth's.
+.SH AUTHENTICATION
+.TP
+.B auth.enabled: false
+(development overlay, and the default for every launch through the start
+scripts).
+Every request is logged in as superuser
+.BR dev ,
+including
+.IR /admin/ .
+.TP
+.B auth.enabled: true
+(production overlay).
+Every view above except the about page requires a login.
+The sign-in page shows only the Fermilab and Google buttons, but the
+allauth username/password signup endpoint
+.I /accounts/signup/
+accepts a POST from anyone, logs the new user in, and grants the same read
+and write access as an SSO user.
+Any Google account is also accepted.
+There is no authorisation layer: every authenticated user can use the entry
+forms and the bug-report page.
+.PP
+Sessions are database-backed (Django default).
+Nothing sets HTTPS, HSTS or secure-cookie options.
+.SH DISCOVERY
+When serving,
+.I runs/apps.py
+starts a
+.B mu2edaq_discovery.Responder
+(name
+.BR "Run Log Database" ,
+app
+.BR runlog\-db ,
+port
+.BR RUNLOGDB_PORT ,
+scheme
+.BR http ,
+no
+.BR meta )
+if the optional package is importable.
+It advertises the host's FQDN even when the server is bound to 127.0.0.1.
+Under gunicorn each worker process starts its own responder.
+.SH FILES
+.TP
+.I runlogdb/settings.py
+Settings loader; see
+.BR mu2edaq\-runlog\-db.yaml (5).
+.TP
+.I runlogdb/db_router.py
+Returns
+.B allow_migrate=False
+for the
+.B runs
+app on PostgreSQL; it does not route or restrict reads or writes.
+.TP
+.I db\-schema.md
+Entity-relationship diagram of the production schema.
+.SH SEE ALSO
+.BR start\-mu2edaq\-runlog\-db.sh (1),
+.BR start\-mu2e\-rundb\-viewer (1),
+.BR manage.py (1),
+.BR mu2edaq\-runlog\-db.yaml (5)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

@@ -1,0 +1,38 @@
+.TH STOP-MU2E-RUNDB-VIEWER 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+stop-mu2e-rundb-viewer \- stop the Mu2e run-log web viewer
+.SH SYNOPSIS
+.B stop\-mu2e\-rundb\-viewer
+.SH DESCRIPTION
+Reads
+.I .runserver.pid
+next to the script.
+If the file is absent, or names a process that is not running, it says so,
+removes a stale file, and exits 0.
+Otherwise it sends SIGTERM, waits up to 10 seconds, sends SIGKILL if the
+process is still alive, and removes the PID file.
+For gunicorn the PID is the master, which stops its workers.
+.SH OPTIONS
+None.
+Arguments are accepted and ignored.
+.SH FILES
+.TP
+.I .runserver.pid
+Written by
+.BR start\-mu2e\-rundb\-viewer (1).
+.SH EXIT STATUS
+0 in all normal cases.
+Non-zero only if
+.B kill
+fails, for example when the process belongs to another user.
+.SH EXAMPLES
+.RS
+.nf
+\&./stop\-mu2e\-rundb\-viewer
+.fi
+.RE
+.SH SEE ALSO
+.BR start\-mu2e\-rundb\-viewer (1),
+.BR stop\-mu2edaq\-runlog\-db.sh (1)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.

@@ -1,0 +1,62 @@
+.TH START-MU2EDAQ-RUNLOG-DB.SH 1 "2026-10-06" "mu2edaq-runlog-db t01.00.00" "Mu2e DAQ Manual"
+.SH NAME
+start-mu2edaq-runlog-db.sh \- control-room start wrapper for the run-log viewer
+.SH SYNOPSIS
+.B start\-mu2edaq\-runlog\-db.sh
+.RI [ argument ...]
+.SH DESCRIPTION
+Standardised Mu2e control-room start script, run by
+.B crs-app start runlog-db
+(entry
+.B runlog\-db
+in
+.IR mu2edaq\-controlroom\-setup/config/apps.yaml ,
+.BR "ports: {http: 8000}" ).
+It sets
+.B RUNLOGDB_PORT
+and
+.BR exec s
+.BR start\-mu2e\-rundb\-viewer (1)
+with any arguments, which that script ignores.
+.PP
+This file and
+.B start\-mu2e\-rundb\-viewer
+are both regular files in git (mode 100755), not symbolic links; this one is
+a two-line adapter, not a duplicate.
+.PP
+The wrapper does not set
+.BR DJANGO_ENV ,
+and nothing in mu2edaq-main does, so a control-room launch runs in
+development mode: no authentication, every request is the superuser
+.BR dev ,
+DEBUG on, and a local SQLite database rather than the production run log.
+See
+.BR start\-mu2e\-rundb\-viewer (1).
+.SH OPTIONS
+None of its own.
+.SH ENVIRONMENT
+.TP
+.B CRS_PORT_HTTP
+Port exported by the control-room launcher.
+Takes precedence over
+.BR RUNLOGDB_PORT .
+.TP
+.B RUNLOGDB_PORT
+Used when
+.B CRS_PORT_HTTP
+is unset; default 8000.
+.SH EXIT STATUS
+That of
+.BR start\-mu2e\-rundb\-viewer (1).
+.SH EXAMPLES
+.RS
+.nf
+CRS_PORT_HTTP=8000 ./start\-mu2edaq\-runlog\-db.sh
+DJANGO_ENV=production ./start\-mu2edaq\-runlog\-db.sh
+.fi
+.RE
+.SH SEE ALSO
+.BR stop\-mu2edaq\-runlog\-db.sh (1),
+.BR start\-mu2e\-rundb\-viewer (1)
+.SH AUTHOR
+Mu2e DAQ group, Fermilab.
