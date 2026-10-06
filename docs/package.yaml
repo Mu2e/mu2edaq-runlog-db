@@ -1,0 +1,225 @@
+schema: mega-review/1
+package: mu2edaq-runlog-db
+tier: A
+group: operations
+repo:
+  url: git@github.com:Mu2e/mu2edaq-runlog-db.git
+  exists: true
+  issues_enabled: true
+doc_dir: docs
+summary: >
+  Django web viewer and manual-entry tool for the Mu2e DAQ run-log database
+  (runs, subruns, EWT lookup) on SQLite or the production PostgreSQL written by
+  the otsdaq DBRunInfo plugin, served on port 8000
+languages: [python, html, bash]
+loc: 2718
+
+runtime:
+  executables:
+    - name: runlogdb.wsgi (gunicorn / manage.py runserver)
+      kind: daemon
+      man_page: man/man7/mu2edaq-runlog-db.7
+    - name: start-mu2edaq-runlog-db.sh
+      kind: script
+      man_page: man/man1/start-mu2edaq-runlog-db.sh.1
+    - name: stop-mu2edaq-runlog-db.sh
+      kind: script
+      man_page: man/man1/stop-mu2edaq-runlog-db.sh.1
+    - name: start-mu2e-rundb-viewer
+      kind: script
+      man_page: man/man1/start-mu2e-rundb-viewer.1
+    - name: stop-mu2e-rundb-viewer
+      kind: script
+      man_page: man/man1/stop-mu2e-rundb-viewer.1
+    - name: bootstrap-mu2e-rundb-viewer
+      kind: script
+      man_page: man/man1/bootstrap-mu2e-rundb-viewer.1
+    - name: manage.py
+      kind: cli
+      man_page: man/man1/manage.py.1
+  services: []
+  ports:
+    - {port: 8000, proto: tcp, role: web-ui, source: "start-mu2e-rundb-viewer:43"}
+    - {port: 8000, proto: tcp, role: web-ui-docker, source: "Dockerfile:27"}
+    - {port: 28999, proto: udp, role: discovery-responder, source: "runs/apps.py:27"}
+    - {port: 5432, proto: tcp, role: postgres-client, source: "config/default.yaml:7"}
+  config_files: [config/default.yaml, config/development.yaml, config/production.yaml, .env]
+  env_vars:
+    - DJANGO_ENV
+    - DJANGO_SETTINGS_MODULE
+    - CRS_PORT_HTTP
+    - RUNLOGDB_HOST
+    - RUNLOGDB_PORT
+    - RUNLOGDB_SECRET_KEY
+    - RUNLOGDB_DEBUG
+    - RUNLOGDB_DB_BACKEND
+    - RUNLOGDB_DB_HOST
+    - RUNLOGDB_DB_PORT
+    - RUNLOGDB_DB_NAME
+    - RUNLOGDB_DB_USER
+    - RUNLOGDB_DB_PASSWORD
+    - RUNLOGDB_AUTH_ENABLED
+    - RUNLOGDB_FERMILAB_CLIENT_ID
+    - RUNLOGDB_FERMILAB_CLIENT_SECRET
+    - RUNLOGDB_GOOGLE_CLIENT_ID
+    - RUNLOGDB_GOOGLE_CLIENT_SECRET
+    - RUNLOGDB_GITHUB_TOKEN
+    - RUNLOGDB_GITHUB_REPO
+
+interactions:
+  depends_on:
+    - package: mu2edaq-discovery
+      via: import
+      direction: out
+      evidence: "runs/apps.py:24"
+    - package: otsdaq-mu2e
+      via: postgres-read
+      direction: out
+      evidence: "runs/models.py:54"
+  depended_on_by: []
+  external: [postgresql, github-api, google-oauth, fermilab-keycloak-oidc, pypi, cdn.tailwindcss.com]
+
+quality:
+  tests: {present: false, framework: none, count: 0}
+  ci: {present: false, workflows: []}
+  license: MIT
+  artifacts_clean: true
+
+findings:
+  - id: RL-001
+    severity: S1
+    type: bug
+    title: "[auth] open allauth signup lets anyone who reaches :8000 create an account with read and write access to the run log"
+    issue: pending
+    fingerprint: fc08916c
+  - id: RL-002
+    severity: S2
+    type: bug
+    title: "[config] the start script forces DJANGO_ENV=development ahead of .env, so control-room launches run with no auth, an auto-login superuser and an empty SQLite"
+    issue: pending
+    fingerprint: 980c743f
+  - id: RL-003
+    severity: S2
+    type: bug
+    title: "[db] manual run entry and seed_db insert explicit run numbers behind the DAQ's sequence, so a later DAQ run start can fail on a duplicate key"
+    issue: pending
+    fingerprint: 8d389ab2
+  - id: RL-004
+    severity: S2
+    type: bug
+    title: "[db] Subrun, RunTransition, Config and ArtdaqFcl models assume an id column the production tables do not have"
+    issue: pending
+    fingerprint: e1723201
+  - id: RL-005
+    severity: S2
+    type: bug
+    title: "[ops] purge_db and seed_db run against the production PostgreSQL with no backend guard"
+    issue: pending
+    fingerprint: aa887f8b
+  - id: RL-006
+    severity: S2
+    type: bug
+    title: "[config] production inherits a committed SECRET_KEY, localhost-only ALLOWED_HOSTS with no override, no HTTPS settings and a development Keycloak realm"
+    issue: pending
+    fingerprint: 77df07e5
+  - id: RL-007
+    severity: S3
+    type: enhancement
+    title: "[db] the viewer keeps its auth and session tables in the production run-log database, migrates on every start, and has no schema setting"
+    issue: pending
+    fingerprint: 39e61f43
+  - id: RL-008
+    severity: S3
+    type: bug
+    title: "[ops] every start runs pip install --upgrade against PyPI under set -e"
+    issue: pending
+    fingerprint: 4f6f8d5a
+  - id: RL-009
+    severity: S3
+    type: bug
+    title: "[web] any logged-in user can file GitHub issues with the server's repo-scope token; no request timeout"
+    issue: pending
+    fingerprint: eb17188c
+  - id: RL-010
+    severity: S3
+    type: bug
+    title: "[discovery] the responder advertises the host FQDN while the server binds 127.0.0.1, and gunicorn starts one responder per worker"
+    issue: pending
+    fingerprint: 4c1344f8
+  - id: RL-011
+    severity: S3
+    type: enhancement
+    title: "[tests] no tests and no CI for an application that writes to the production run log"
+    issue: pending
+    fingerprint: e4b69e3d
+  - id: RL-012
+    severity: S4
+    type: enhancement
+    title: "[ui] Tailwind is loaded from cdn.tailwindcss.com at runtime"
+    issue: pending
+    fingerprint: 3da86965
+  - id: RL-013
+    severity: S4
+    type: documentation
+    title: "[docs] duplicate schema dump, and setup docs that rely on .env for DJANGO_ENV"
+    issue: pending
+    fingerprint: b0a37983
+
+notes:
+  auth_verdict: >
+    Open to anyone who reaches :8000. Production overlay: every /runs/ view
+    except /runs/about/ is @login_required, but django-allauth local signup is
+    left open (no ACCOUNT_ADAPTER; templates hide the form, the endpoint still
+    accepts a POST) and grants full read and write access; verified end-to-end
+    with CSRF enforcement and a self-chosen token (RL-001). Any Google account
+    is admitted. ALLOWED_HOSTS is bypassed by sending Host: localhost.
+    Development overlay, which is what every scripted and control-room launch
+    gets because start-mu2e-rundb-viewer:39 pre-exports DJANGO_ENV=development
+    and .env cannot override it (RL-002): no authentication, every request is
+    superuser "dev", DEBUG on, ALLOWED_HOSTS "*", bound to 127.0.0.1 by
+    default.
+  secret_key: >
+    RUNLOGDB_SECRET_KEY, else the committed "change-me-before-deploying"
+    (config/default.yaml:29), inherited by production with no check. Sessions
+    are database-backed, so the known key does not mint a login (RL-006).
+  debug_allowed_hosts: >
+    Production DEBUG false; ALLOWED_HOSTS [localhost, 127.0.0.1] inherited,
+    no env override. Development DEBUG true, ALLOWED_HOSTS ["*"].
+  db_router: >
+    ProductionRouter only implements allow_migrate (False for app runs on
+    PostgreSQL). No db_for_read/db_for_write; it does not make anything
+    read-only. The app writes run, run_end_info and subrun through its entry
+    forms, and seed_db/purge_db write and delete all nine tables (RL-003,
+    RL-005). Django's own tables are migrated into the run-log DB (RL-007).
+  sql_construction: >
+    None in this package: ORM only, no raw(), extra() or cursor use. The
+    writer, otsdaq-mu2e DBRunInfo, builds SQL by string concatenation with a
+    sanitised comment; outside this package and Tier B, not reviewed.
+  data_source: >
+    otsdaq-mu2e RunInfoPlugins/DBRunInfo (DEFINE_OTS_PROCESSOR at
+    DBRunInfo_runInfo.cc:1346) inserts run (:902-910, number from the
+    sequence via RETURNING run_number), run_transition (:1077), run_end_info
+    (:1115) and config (:491), schema-qualified by
+    OTSDAQ_RUNINFO_DATABASE_SCHEMA (default test) in database
+    OTSDAQ_RUNINFO_DATABASE (default run_info) (:20-37). DBRunInfo does not
+    write subrun; that writer is not identified in mu2edaq-main.
+  entry_points: >
+    git ls-files -s shows no mode-120000 entries. start-/stop-mu2edaq-runlog-db.sh
+    are 2-line control-room wrappers that exec start-/stop-mu2e-rundb-viewer
+    (mapping CRS_PORT_HTTP to RUNLOGDB_PORT); not duplicates.
+  via_extension: >
+    The otsdaq-mu2e dependency is a shared PostgreSQL database; the contract's
+    via list has sqlite-read but no PostgreSQL entry, so postgres-read is used.
+    Evidence is the model bound to the table DBRunInfo writes.
+  discovery_meta: >
+    Responder is constructed without meta (runs/apps.py:27-29), so the
+    CONTRACT 9.5 string-only rule holds.
+  venv: >
+    .venv/ exists on disk, is git-ignored and untracked; not a finding. It was
+    used read-only as the interpreter for the scratch-copy verification.
+  loc: >
+    2718 = Python 1481 (incl. 241-line migration) + templates 971 + shell 186
+    + config YAML 50 + Dockerfile 30. Excludes Markdown, the schema dumps and
+    PNGs.
+  man_layout: >
+    New pages in man/manN/; no git mv; no stale path references.
